@@ -1,14 +1,3 @@
-# Menjaga dashboard di Streamlit Community Cloud tetap aktif.
-#
-# Aplikasi tanpa pengunjung selama 12 jam akan tidur. Workflow ini membuka dashboard
-# dengan browser sungguhan setiap 6 jam, sama seperti pengunjung biasa, dan menekan
-# tombol "Yes, get this app back up!" kalau aplikasinya sedang tidur.
-#
-# Cara pakai:
-#   1. Simpan berkas ini di repository sebagai  .github/workflows/keep-awake.yml
-#   2. Ganti APP_URL di bawah dengan alamat dashboard setelah di-deploy.
-#   3. Di GitHub: tab Actions -> "Keep dashboard awake" -> Run workflow, untuk uji coba pertama.
-#   4. Hapus berkas ini setelah nilai keluar.
 
 name: Keep dashboard awake
 
@@ -18,7 +7,7 @@ on:
   workflow_dispatch:            # bisa juga dijalankan manual dari tab Actions
 
 env:
-  APP_URL: "https://GANTI-DENGAN-ALAMAT-APP.streamlit.app/"
+  APP_URL: "https://fin-citibike-dashboard.streamlit.app/"
 
 jobs:
   visit:
