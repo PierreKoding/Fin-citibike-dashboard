@@ -1,0 +1,16 @@
+{
+  "run_id": "20261105T083506447654Z",
+  "trips_total": 119311,
+  "trips_by_month": {
+    "Mei": 36135,
+    "Juni": 39430,
+    "Juli": 43746
+  },
+  "days": 92,
+  "stations_in_scope": 52,
+  "station_hour_rows": 113617,
+  "test_rows_per_target": 38688,
+  "graph_trips": 117016,
+  "graph_edges": 2379,
+  "graph_self_loop_trips": 6334
+}

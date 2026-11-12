@@ -1,0 +1,5 @@
+# Keluaran pipeline mentah: hanya dipakai oleh prepare_data.py, tidak ikut ke GitHub
+source/
+__pycache__/
+*.pyc
+.DS_Store

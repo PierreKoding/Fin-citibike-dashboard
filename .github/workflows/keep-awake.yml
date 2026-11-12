@@ -1,0 +1,66 @@
+# Menjaga dashboard di Streamlit Community Cloud tetap aktif.
+#
+# Aplikasi tanpa pengunjung selama 12 jam akan tidur. Workflow ini membuka dashboard
+# dengan browser sungguhan setiap 6 jam, sama seperti pengunjung biasa, dan menekan
+# tombol "Yes, get this app back up!" kalau aplikasinya sedang tidur.
+#
+# Cara pakai:
+#   1. Simpan berkas ini di repository sebagai  .github/workflows/keep-awake.yml
+#   2. Ganti APP_URL di bawah dengan alamat dashboard setelah di-deploy.
+#   3. Di GitHub: tab Actions -> "Keep dashboard awake" -> Run workflow, untuk uji coba pertama.
+#   4. Hapus berkas ini setelah nilai keluar.
+
+name: Keep dashboard awake
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"      # setiap 6 jam (UTC); jadwal GitHub bisa terlambat beberapa menit
+  workflow_dispatch:            # bisa juga dijalankan manual dari tab Actions
+
+env:
+  APP_URL: "https://GANTI-DENGAN-ALAMAT-APP.streamlit.app/"
+
+jobs:
+  visit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pasang Playwright dan Chromium
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+
+      - name: Buka dashboard seperti pengunjung
+        run: |
+          python - <<'EOF'
+          import os
+          import sys
+          from playwright.sync_api import sync_playwright
+
+          url = os.environ["APP_URL"]
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              page = browser.new_page()
+              page.goto(url, wait_until="domcontentloaded", timeout=120_000)
+              page.wait_for_timeout(10_000)
+
+              wake_button = page.get_by_role("button", name="Yes, get this app back up!")
+              if wake_button.count() > 0:
+                  print("Aplikasi sedang tidur. Menekan tombol bangun...")
+                  wake_button.first.click()
+                  page.wait_for_timeout(120_000)      # beri waktu aplikasi menyala
+              else:
+                  page.wait_for_timeout(20_000)       # tetap terbuka sebentar supaya tercatat sebagai kunjungan
+
+              # Dashboard dianggap tampil kalau wadah utama Streamlit ada di halaman atau di salah satu frame.
+              shown = any(frame.locator('[data-testid="stApp"]').count() > 0 for frame in page.frames)
+              browser.close()
+
+          if not shown:
+              sys.exit("Dashboard belum tampil. Buka alamatnya secara manual untuk memeriksa.")
+          print("Dashboard aktif.")
+          EOF
